@@ -17,17 +17,12 @@ import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
 import org.keycloak.models.*;
-import org.keycloak.models.utils.FormMessage;
-import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
-import org.keycloak.sessions.AuthenticationSessionModel;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @AutoService(DisplayTypeRequiredActionFactory.class)
 public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeRequiredActionFactory {
@@ -43,18 +38,18 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
         fakeRealm.setPasswordPolicy(policy);
         int daysToExpirePassword = fakeRealm.getPasswordPolicy().getDaysToExpirePassword();
         logger.infof("GroupPolicy expires day %d", daysToExpirePassword);
-        if (daysToExpirePassword != -1) {
-            PasswordCredentialProvider passwordProvider = (PasswordCredentialProvider) context.getSession().getProvider(CredentialProvider.class, PasswordCredentialProviderFactory.PROVIDER_ID);
+        if(daysToExpirePassword != -1) {
+            PasswordCredentialProvider passwordProvider = (PasswordCredentialProvider)context.getSession().getProvider(CredentialProvider.class, PasswordCredentialProviderFactory.PROVIDER_ID);
             CredentialModel password = passwordProvider.getPassword(context.getRealm(), context.getUser());
             if (password != null) {
-                if (password.getCreatedDate() == null) {
+                if(password.getCreatedDate() == null) {
                     context.getUser().addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
                     logger.info("GroupPolicy User is required to update password");
                 } else {
                     long timeElapsed = Time.toMillis(Time.currentTime()) - password.getCreatedDate();
                     long timeToExpire = TimeUnit.DAYS.toMillis(daysToExpirePassword);
 
-                    if (timeElapsed > timeToExpire) {
+                    if(timeElapsed > timeToExpire) {
                         context.getUser().addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
                         logger.info("GroupPolicy User is required to update password");
                     }
@@ -74,53 +69,40 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
     @Override
     public void processAction(RequiredActionContext context) {
         EventBuilder event = context.getEvent();
-        AuthenticationSessionModel authSession = context.getAuthenticationSession();
-        RealmModel realm = context.getRealm();
-        UserModel user = context.getUser();
-        KeycloakSession session = context.getSession();
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         event.event(EventType.UPDATE_PASSWORD);
         String passwordNew = formData.getFirst("password-new");
         String passwordConfirm = formData.getFirst("password-confirm");
 
         EventBuilder errorEvent = event.clone().event(EventType.UPDATE_PASSWORD_ERROR)
-                .client(authSession.getClient())
-                .user(authSession.getAuthenticatedUser());
+                .client(context.getAuthenticationSession().getClient())
+                .user(context.getAuthenticationSession().getAuthenticatedUser());
 
         if (Validation.isBlank(passwordNew)) {
             Response challenge = context.form()
-                    .setAttribute("username", authSession.getAuthenticatedUser().getUsername())
-                    .addError(new FormMessage(Validation.FIELD_PASSWORD, Messages.MISSING_PASSWORD))
+                    .setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
+                    .setError(Messages.MISSING_PASSWORD)
                     .createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
             context.challenge(challenge);
             errorEvent.error(Errors.PASSWORD_MISSING);
             return;
         } else if (!passwordNew.equals(passwordConfirm)) {
             Response challenge = context.form()
-                    .setAttribute("username", authSession.getAuthenticatedUser().getUsername())
-                    .addError(new FormMessage(Validation.FIELD_PASSWORD_CONFIRM, Messages.NOTMATCH_PASSWORD))
+                    .setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
+                    .setError(Messages.NOTMATCH_PASSWORD)
                     .createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
             context.challenge(challenge);
             errorEvent.error(Errors.PASSWORD_CONFIRM_ERROR);
             return;
         }
 
-        if (UserModel.RequiredAction.UPDATE_PASSWORD.name().equals(authSession.getClientNote(Constants.KC_ACTION_EXECUTING))
-                && "on".equals(formData.getFirst("logout-sessions"))) {
-            session.sessions().getUserSessionsStream(realm, user)
-                    .filter(s -> !Objects.equals(s.getId(), authSession.getParentSession().getId()))
-                    .collect(Collectors.toList()) // collect to avoid concurrent modification as backchannelLogout removes the user sessions.
-                    .forEach(s -> AuthenticationManager.backchannelLogout(session, realm, s, session.getContext().getUri(),
-                            context.getConnection(), context.getHttpRequest().getHttpHeaders(), true));
-        }
-
         try {
-            session.userCredentialManager().updateCredential(realm, user, UserCredentialModel.password(passwordNew, false));
+            context.getSession().userCredentialManager().updateCredential(context.getRealm(), context.getUser(), UserCredentialModel.password(passwordNew, false));
             context.success();
         } catch (ModelException me) {
             errorEvent.detail(Details.REASON, me.getMessage()).error(Errors.PASSWORD_REJECTED);
             Response challenge = context.form()
-                    .setAttribute("username", authSession.getAuthenticatedUser().getUsername())
+                    .setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
                     .setError(me.getMessage(), me.getParameters())
                     .createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
             context.challenge(challenge);
@@ -128,7 +110,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
         } catch (Exception ape) {
             errorEvent.detail(Details.REASON, ape.getMessage()).error(Errors.PASSWORD_REJECTED);
             Response challenge = context.form()
-                    .setAttribute("username", authSession.getAuthenticatedUser().getUsername())
+                    .setAttribute("username", context.getAuthenticationSession().getAuthenticatedUser().getUsername())
                     .setError(ape.getMessage())
                     .createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
             context.challenge(challenge);

@@ -17,7 +17,7 @@ public class PolicyCollector {
 
         LinkedList<String> policies = new LinkedList<>();
         // Iterate groups and collect policy strings
-        user.getGroupsStream()
+        user.getGroups()
                 .forEach((GroupModel group) -> {
                     if (group.getName().equals(groupPolicyName)) {
                         logger.debugf("GroupPolicy group %s", group.getName());
