@@ -1,7 +1,7 @@
 package com.github.sayedcsekuet.keycloak.authentication;
 
 import com.github.sayedcsekuet.keycloak.Utils.PolicyCollector;
-import com.github.sayedcsekuet.keycloak.policy.FakeRealm;
+import com.github.sayedcsekuet.keycloak.policy.Realm;
 import com.google.auto.service.AutoService;
 import org.jboss.logging.Logger;
 import org.keycloak.OAuth2Constants;
@@ -39,7 +39,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
         String policyString = PolicyCollector.collectPolicies(context.getRealm(), context.getUser());
         logger.infof("GroupPolicy collected policy %s", policyString);
         PasswordPolicy policy = PolicyCollector.parsePolicy(context.getSession(), policyString);
-        FakeRealm fakeRealm = new FakeRealm();
+        Realm fakeRealm = new Realm();
         fakeRealm.setPasswordPolicy(policy);
         int daysToExpirePassword = fakeRealm.getPasswordPolicy().getDaysToExpirePassword();
         logger.infof("GroupPolicy expires day %d", daysToExpirePassword);

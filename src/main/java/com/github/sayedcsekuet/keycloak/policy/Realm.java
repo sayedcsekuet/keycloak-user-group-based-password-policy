@@ -1,19 +1,3 @@
-/*
- * Copyright 2019 Julian Picht
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.github.sayedcsekuet.keycloak.policy;
 
 import java.util.List;
@@ -39,7 +23,7 @@ import org.keycloak.models.RequiredCredentialModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.WebAuthnPolicy;
 
-public class FakeRealm implements RealmModel {
+public class Realm implements RealmModel {
 
     private PasswordPolicy passwordPolicy;
 
@@ -428,7 +412,7 @@ public class FakeRealm implements RealmModel {
     public int getClientSessionIdleTimeout() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
- 
+
     @Override
     public void setClientSessionIdleTimeout(int seconds) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -499,11 +483,6 @@ public class FakeRealm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * This method will return a map with all the lifespans available
-     * or an empty map, but never null.
-     * @return map with user action token lifespans
-     */
     @Override
     public Map<String, Integer> getUserActionTokenLifespans() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -579,37 +558,21 @@ public class FakeRealm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * @return  WebAuthn policy for 2-factor authentication
-     */
     @Override
     public WebAuthnPolicy getWebAuthnPolicy() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * Set WebAuthn policy for 2-factor authentication
-     *
-     * @param policy
-     */
     @Override
     public void setWebAuthnPolicy(WebAuthnPolicy policy) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     *
-     * @return WebAuthn passwordless policy below. This is temporary and will be removed later.
-     */
     @Override
     public WebAuthnPolicy getWebAuthnPolicyPasswordless() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * Set WebAuthn passwordless policy below. This is temporary and will be removed later.
-     * @param policy
-     */
     @Override
     public void setWebAuthnPolicyPasswordless(WebAuthnPolicy policy) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -618,6 +581,11 @@ public class FakeRealm implements RealmModel {
     @Override
     public RoleModel getRoleById(String id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Stream<GroupModel> getDefaultGroupsStream() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -646,20 +614,20 @@ public class FakeRealm implements RealmModel {
     }
 
     @Override
-    public Stream<RoleModel> getRolesStream(Integer integer, Integer integer1) {
+    public Stream<RoleModel> getRolesStream(Integer firstResult, Integer maxResults) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Stream<RoleModel> searchForRolesStream(String s, Integer integer, Integer integer1) {
+    public Stream<RoleModel> searchForRolesStream(String search, Integer first, Integer max) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
 
     @Override
     public Stream<String> getDefaultRolesStream() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     @Override
     public void addDefaultRole(String name) {
@@ -669,11 +637,6 @@ public class FakeRealm implements RealmModel {
     @Override
     public void removeDefaultRoles(String... defaultRoles) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Stream<GroupModel> getDefaultGroupsStream() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -691,22 +654,22 @@ public class FakeRealm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-
     @Override
-    public Stream<ClientModel> getClientsStream(Integer integer, Integer integer1) {
+    public Stream<ClientModel> getClientsStream(Integer firstResult, Integer maxResults) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     @Override
     public Long getClientsCount() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
     @Override
     public Stream<ClientModel> getAlwaysDisplayInConsoleClientsStream() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     @Override
     public ClientModel addClient(String name) {
@@ -853,11 +816,11 @@ public class FakeRealm implements RealmModel {
     public void updateAuthenticationFlow(AuthenticationFlowModel model) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
     @Override
-    public Stream<AuthenticationExecutionModel> getAuthenticationExecutionsStream(String s) {
+    public Stream<AuthenticationExecutionModel> getAuthenticationExecutionsStream(String flowId) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     @Override
     public AuthenticationExecutionModel getAuthenticationExecutionById(String id) {
@@ -868,6 +831,7 @@ public class FakeRealm implements RealmModel {
     public AuthenticationExecutionModel getAuthenticationExecutionByFlowId(String flowId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
     @Override
     public AuthenticationExecutionModel addAuthenticatorExecution(AuthenticationExecutionModel model) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -882,12 +846,11 @@ public class FakeRealm implements RealmModel {
     public void removeAuthenticatorExecution(AuthenticationExecutionModel model) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-
     @Override
     public Stream<AuthenticatorConfigModel> getAuthenticatorConfigsStream() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     @Override
     public AuthenticatorConfigModel addAuthenticatorConfig(AuthenticatorConfigModel model) {
@@ -914,11 +877,11 @@ public class FakeRealm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
     @Override
     public Stream<RequiredActionProviderModel> getRequiredActionProvidersStream() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     @Override
     public RequiredActionProviderModel addRequiredActionProvider(RequiredActionProviderModel model) {
@@ -977,7 +940,7 @@ public class FakeRealm implements RealmModel {
 
 
     @Override
-    public Stream<IdentityProviderMapperModel> getIdentityProviderMappersByAliasStream(String s) {
+    public Stream<IdentityProviderMapperModel> getIdentityProviderMappersByAliasStream(String brokerAlias) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -1005,25 +968,11 @@ public class FakeRealm implements RealmModel {
     public IdentityProviderMapperModel getIdentityProviderMapperByName(String brokerAlias, String name) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-
-    /**
-     * Adds component model.  Will call onCreate() method of ComponentFactory
-     *
-     * @param model
-     * @return
-     */
     @Override
     public ComponentModel addComponentModel(ComponentModel model) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * Adds component model.  Will NOT call onCreate() method of ComponentFactory
-     *
-     * @param model
-     * @return
-     */
     @Override
     public ComponentModel importComponentModel(ComponentModel model) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -1044,14 +993,13 @@ public class FakeRealm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
     @Override
-    public Stream<ComponentModel> getComponentsStream(String s, String s1) {
+    public Stream<ComponentModel> getComponentsStream(String parentId, String providerType) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public Stream<ComponentModel> getComponentsStream(String s) {
+    public Stream<ComponentModel> getComponentsStream(String parentId) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -1146,16 +1094,17 @@ public class FakeRealm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+
     @Override
     public void setEventsListeners(Set<String> listeners) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
     @Override
     public Stream<String> getEnabledEventTypesStream() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
 
     @Override
     public void setEnabledEventTypes(Set<String> enabledEventTypes) {
