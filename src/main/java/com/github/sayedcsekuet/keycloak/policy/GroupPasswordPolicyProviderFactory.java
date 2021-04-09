@@ -47,7 +47,7 @@ public class GroupPasswordPolicyProviderFactory implements PasswordPolicyProvide
 
     @Override
     public boolean isMultiplSupported() {
-        return true;
+        return false;
     }
 
     @Override

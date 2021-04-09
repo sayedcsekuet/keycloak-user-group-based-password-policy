@@ -1,19 +1,3 @@
-/*
- * Copyright 2019 Julian Picht
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.github.sayedcsekuet.keycloak.policy;
 
 import java.util.List;
@@ -38,7 +22,7 @@ import org.keycloak.models.RequiredCredentialModel;
 import org.keycloak.models.RoleModel;
 import org.keycloak.models.WebAuthnPolicy;
 
-public class FakeRealm implements RealmModel {
+public class Realm implements RealmModel {
 
     private PasswordPolicy passwordPolicy;
 
@@ -427,7 +411,7 @@ public class FakeRealm implements RealmModel {
     public int getClientSessionIdleTimeout() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
- 
+
     @Override
     public void setClientSessionIdleTimeout(int seconds) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -501,6 +485,7 @@ public class FakeRealm implements RealmModel {
     /**
      * This method will return a map with all the lifespans available
      * or an empty map, but never null.
+     *
      * @return map with user action token lifespans
      */
     @Override
@@ -579,7 +564,7 @@ public class FakeRealm implements RealmModel {
     }
 
     /**
-     * @return  WebAuthn policy for 2-factor authentication
+     * @return WebAuthn policy for 2-factor authentication
      */
     @Override
     public WebAuthnPolicy getWebAuthnPolicy() {
@@ -597,7 +582,6 @@ public class FakeRealm implements RealmModel {
     }
 
     /**
-     *
      * @return WebAuthn passwordless policy below. This is temporary and will be removed later.
      */
     @Override
@@ -607,6 +591,7 @@ public class FakeRealm implements RealmModel {
 
     /**
      * Set WebAuthn passwordless policy below. This is temporary and will be removed later.
+     *
      * @param policy
      */
     @Override
@@ -867,6 +852,7 @@ public class FakeRealm implements RealmModel {
     public AuthenticationExecutionModel getAuthenticationExecutionByFlowId(String flowId) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
     @Override
     public AuthenticationExecutionModel addAuthenticatorExecution(AuthenticationExecutionModel model) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
