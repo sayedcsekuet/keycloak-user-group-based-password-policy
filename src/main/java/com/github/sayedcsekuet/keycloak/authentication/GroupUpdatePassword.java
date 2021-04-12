@@ -36,7 +36,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
         logger.info("GroupPolicy UpdatePassword");
-        String policyString = PolicyCollector.collectPolicies(context.getRealm(), context.getUser());
+        String policyString = PolicyCollector.collectPolicies(context.getSession(), context.getRealm(), context.getUser());
         logger.infof("GroupPolicy collected policy %s", policyString);
         PasswordPolicy policy = PolicyCollector.parsePolicy(context.getSession(), policyString);
         Realm fakeRealm = new Realm();
@@ -140,6 +140,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
     public void close() {
 
     }
+
     @Override
     public RequiredActionProvider createDisplay(KeycloakSession session, String displayType) {
         if (displayType == null) return this;
