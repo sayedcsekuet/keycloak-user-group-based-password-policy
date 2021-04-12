@@ -31,25 +31,25 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
         logger.info("GroupPolicy UpdatePassword");
-        String policyString = PolicyCollector.collectPolicies(context.getRealm(), context.getUser());
+        String policyString = PolicyCollector.collectPolicies(context.getSession(), context.getRealm(), context.getUser());
         logger.infof("GroupPolicy collected policy %s", policyString);
         PasswordPolicy policy = PolicyCollector.parsePolicy(context.getSession(), policyString);
         Realm fakeRealm = new Realm();
         fakeRealm.setPasswordPolicy(policy);
         int daysToExpirePassword = fakeRealm.getPasswordPolicy().getDaysToExpirePassword();
         logger.infof("GroupPolicy expires day %d", daysToExpirePassword);
-        if(daysToExpirePassword != -1) {
-            PasswordCredentialProvider passwordProvider = (PasswordCredentialProvider)context.getSession().getProvider(CredentialProvider.class, PasswordCredentialProviderFactory.PROVIDER_ID);
+        if (daysToExpirePassword != -1) {
+            PasswordCredentialProvider passwordProvider = (PasswordCredentialProvider) context.getSession().getProvider(CredentialProvider.class, PasswordCredentialProviderFactory.PROVIDER_ID);
             CredentialModel password = passwordProvider.getPassword(context.getRealm(), context.getUser());
             if (password != null) {
-                if(password.getCreatedDate() == null) {
+                if (password.getCreatedDate() == null) {
                     context.getUser().addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
                     logger.info("GroupPolicy User is required to update password");
                 } else {
                     long timeElapsed = Time.toMillis(Time.currentTime()) - password.getCreatedDate();
                     long timeToExpire = TimeUnit.DAYS.toMillis(daysToExpirePassword);
 
-                    if(timeElapsed > timeToExpire) {
+                    if (timeElapsed > timeToExpire) {
                         context.getUser().addRequiredAction(UserModel.RequiredAction.UPDATE_PASSWORD);
                         logger.info("GroupPolicy User is required to update password");
                     }
@@ -122,6 +122,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
     public void close() {
 
     }
+
     @Override
     public RequiredActionProvider createDisplay(KeycloakSession session, String displayType) {
         if (displayType == null) return this;

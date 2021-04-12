@@ -18,10 +18,7 @@ package com.github.sayedcsekuet.keycloak.policy;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import com.github.sayedcsekuet.keycloak.Utils.PolicyCollector;
 import org.jboss.logging.Logger;
@@ -48,14 +45,14 @@ public class GroupPasswordPolicyProvider implements PasswordPolicyProvider {
     @Override
     public Object parseConfig(String value) {
         if (value == null || value.isEmpty()) {
-            throw new PasswordPolicyConfigException("GroupPolicy Attribute name cannot be blank");
+            throw new PasswordPolicyConfigException("GroupPolicy group name cannot be blank");
         }
         return value;
     }
 
     @Override
     public PolicyError validate(RealmModel realm, UserModel user, String password) {
-        String policyString = PolicyCollector.collectPolicies(realm, user);
+        String policyString = PolicyCollector.collectPolicies(session, realm, user);
         logger.infof("GroupPolicy Adding group policy %s", policyString);
         PasswordPolicy policy = PolicyCollector.parsePolicy(session, policyString);
         LinkedList<PolicyError> list = new LinkedList<>(validatePasswordPolicy(policy, realm, user, password));
@@ -76,9 +73,9 @@ public class GroupPasswordPolicyProvider implements PasswordPolicyProvider {
                 list.add(error);
             }
         }
-
         return list;
     }
+
     protected PolicyError validatePolicyProvider(PasswordPolicy policy, String id, RealmModel realm, UserModel user, String password) {
         RealmModel realRealm = session.getContext().getRealm();
         try {
@@ -94,6 +91,9 @@ public class GroupPasswordPolicyProvider implements PasswordPolicyProvider {
         }
     }
 
+    // Translate the messages and remove the common prefix.
+    // We wan't to return ONE message with ALL the problems, not one problem at a time.
+    // The messages have common prefixes in most languages.
     protected PolicyError translateMessges(LinkedList<PolicyError> list, UserModel user) {
         Properties messageProps;
         try {
@@ -106,8 +106,7 @@ public class GroupPasswordPolicyProvider implements PasswordPolicyProvider {
         for (PolicyError e : list) {
             messages.add(MessageFormat.format(messageProps.getProperty(e.getMessage(), e.getMessage()), e.getParameters()));
         }
-
-        return new PolicyError(String.join("\n", messages.getMessagesWithoutPrefix()));
+        return new PolicyError(messages.getPrefix() + String.join(System.lineSeparator(), messages.getMessagesWithoutPrefix()));
     }
 
     @Override
@@ -120,11 +119,11 @@ public class GroupPasswordPolicyProvider implements PasswordPolicyProvider {
     }
 
     private class PrefixRemover {
-        public LinkedList<String> messages;
+        public ArrayList<String> messages;
         public String prefix;
 
         PrefixRemover() {
-            messages = new LinkedList<>();
+            messages = new ArrayList<>();
             prefix = null;
         }
 
