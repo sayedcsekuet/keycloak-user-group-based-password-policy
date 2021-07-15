@@ -1,27 +1,12 @@
 package com.github.sayedcsekuet.keycloak.policy;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.component.ComponentModel;
-import org.keycloak.models.AuthenticationExecutionModel;
-import org.keycloak.models.AuthenticationFlowModel;
-import org.keycloak.models.AuthenticatorConfigModel;
-import org.keycloak.models.ClientModel;
-import org.keycloak.models.ClientScopeModel;
-import org.keycloak.models.GroupModel;
-import org.keycloak.models.IdentityProviderMapperModel;
-import org.keycloak.models.IdentityProviderModel;
-import org.keycloak.models.OTPPolicy;
-import org.keycloak.models.PasswordPolicy;
-import org.keycloak.models.RealmModel;
-import org.keycloak.models.RequiredActionProviderModel;
-import org.keycloak.models.RequiredCredentialModel;
-import org.keycloak.models.RoleModel;
-import org.keycloak.models.WebAuthnPolicy;
+import org.keycloak.models.*;
 
 public class Realm implements RealmModel {
 
@@ -484,6 +469,16 @@ public class Realm implements RealmModel {
     }
 
     @Override
+    public OAuth2DeviceConfig getOAuth2DeviceConfig() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public CibaConfig getCibaPolicy() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public Map<String, Integer> getUserActionTokenLifespans() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -699,6 +694,11 @@ public class Realm implements RealmModel {
     @Override
     public Stream<ClientModel> searchClientByClientIdStream(String s, Integer integer, Integer integer1) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Stream<ClientModel> searchClientByAttributes(Map<String, String> map, Integer integer, Integer integer1) {
+        return null;
     }
 
     @Override
@@ -1142,6 +1142,16 @@ public class Realm implements RealmModel {
     }
 
     @Override
+    public RoleModel getDefaultRole() {
+        return null;
+    }
+
+    @Override
+    public void setDefaultRole(RoleModel roleModel) {
+
+    }
+
+    @Override
     public boolean isIdentityFederationEnabled() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -1285,5 +1295,30 @@ public class Realm implements RealmModel {
     @Override
     public Stream<ClientScopeModel> getDefaultClientScopesStream(boolean b) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ClientInitialAccessModel createClientInitialAccessModel(int i, int i1) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ClientInitialAccessModel getClientInitialAccessModel(String s) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void removeClientInitialAccessModel(String s) {
+
+    }
+
+    @Override
+    public Stream<ClientInitialAccessModel> getClientInitialAccesses() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void decreaseRemainingCount(ClientInitialAccessModel clientInitialAccessModel) {
+
     }
 }

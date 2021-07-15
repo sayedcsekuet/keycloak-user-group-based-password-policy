@@ -18,6 +18,9 @@ Download `keycloak-user-group-based-password-policy-1.0.0.jar` from Releases pag
 #### Keycloak v.12.x
 Download `keycloak-user-group-based-password-policy-2.0.0.jar` from Releases page (or from jar directory). Then deploy it into `$KEYCLOAK_HOME/standalone/deployments/ directory`.
 
+#### Keycloak v.14.x
+Download `keycloak-user-group-based-password-policy-3.0.0.jar` from Releases page (or from jar directory). Then deploy it into `$KEYCLOAK_HOME/standalone/deployments/ directory`.
+
 ### Creating a new Password policy with type **Group Based Policy**
 
 <img src="media/add_new_group_based_policy_01.png" width="300">
