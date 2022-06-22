@@ -35,12 +35,8 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
-        logger.info("GroupPolicy UpdatePassword");
-        String policyString = PolicyCollector.collectPolicies(context.getSession(), context.getRealm(), context.getUser());
-        logger.infof("GroupPolicy collected policy %s", policyString);
-        PasswordPolicy policy = PolicyCollector.parsePolicy(context.getSession(), policyString);
         Realm fakeRealm = new Realm();
-        fakeRealm.setPasswordPolicy(policy);
+        fakeRealm.setPasswordPolicy(PolicyCollector.createGroupPolicy(context.getSession(), context.getRealm(), context.getUser()));
         int daysToExpirePassword = fakeRealm.getPasswordPolicy().getDaysToExpirePassword();
         logger.infof("GroupPolicy expires day %d", daysToExpirePassword);
         if (daysToExpirePassword != -1) {
@@ -114,7 +110,11 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
                             context.getConnection(), context.getHttpRequest().getHttpHeaders(), true));
         }
 
+        PasswordPolicy originalPolicy = realm.getPasswordPolicy();
+
         try {
+            PasswordPolicy mergedPolicy = PolicyCollector.mergeGroupPolicy(context.getSession(), context.getRealm(), context.getUser());
+            realm.setPasswordPolicy(mergedPolicy);
             session.userCredentialManager().updateCredential(realm, user, UserCredentialModel.password(passwordNew, false));
             context.success();
         } catch (ModelException me) {
@@ -133,6 +133,8 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
                     .createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
             context.challenge(challenge);
             return;
+        } finally {
+            realm.setPasswordPolicy(originalPolicy);
         }
     }
 

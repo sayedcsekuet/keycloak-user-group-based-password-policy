@@ -39,7 +39,7 @@ public class GroupPasswordPolicyProvider implements PasswordPolicyProvider {
     public GroupPasswordPolicyProvider(KeycloakSession session) {
         this.session = session;
     }
-    
+
     @Override
     public Object parseConfig(String value) {
         if (value == null || value.isEmpty()) {
@@ -50,9 +50,7 @@ public class GroupPasswordPolicyProvider implements PasswordPolicyProvider {
 
     @Override
     public PolicyError validate(RealmModel realm, UserModel user, String password) {
-        String policyString = PolicyCollector.collectPolicies(session, realm, user);
-        logger.infof("GroupPolicy Adding group policy %s", policyString);
-        PasswordPolicy policy = PolicyCollector.parsePolicy(session, policyString);
+        PasswordPolicy policy = PolicyCollector.createGroupPolicy(session, realm, user);
         LinkedList<PolicyError> list = new LinkedList<>(validatePasswordPolicy(policy, realm, user, password));
 
         if (list.isEmpty()) {

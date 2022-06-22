@@ -27,7 +27,6 @@ public class PolicyCollector {
             user.getGroupsStream()
                     .forEach((GroupModel group) -> {
                         if (group.getName().trim().equals(groupName.trim())) {
-                            logger.infof("GroupPolicy group %s", group.getName());
                             group.getAttributes().forEach((policyString, value) -> {
                                 policyString = policyString.trim();
                                 PasswordPolicyProvider provider = session.getProvider(PasswordPolicyProvider.class, policyString);
@@ -47,5 +46,21 @@ public class PolicyCollector {
     public static PasswordPolicy parsePolicy(KeycloakSession session, String policy) {
         PasswordPolicy parsedPolicy = PasswordPolicy.parse(session, policy);
         return parsedPolicy;
+    }
+
+    public static PasswordPolicy createGroupPolicy(KeycloakSession session, RealmModel realm, UserModel user) {
+        String policyString = PolicyCollector.collectPolicies(session, realm, user);
+        logger.infof("GroupPolicy collected policy: %s", policyString);
+        return PolicyCollector.parsePolicy(session, policyString);
+    }
+
+    public static PasswordPolicy mergeGroupPolicy(KeycloakSession session, RealmModel realm, UserModel user) {
+        String groupPolicy = PolicyCollector.collectPolicies(session, realm, user);
+        if (groupPolicy.equals("")) {
+            return realm.getPasswordPolicy();
+        }
+        String mergedPolicy = realm.getPasswordPolicy().toString() + " and " + groupPolicy;
+        logger.infof("Merged Policy string: %s", mergedPolicy);
+        return PolicyCollector.parsePolicy(session, mergedPolicy);
     }
 }
