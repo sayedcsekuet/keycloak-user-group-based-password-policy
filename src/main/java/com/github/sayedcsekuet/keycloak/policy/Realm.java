@@ -479,6 +479,11 @@ public class Realm implements RealmModel {
     }
 
     @Override
+    public ParConfig getParPolicy() {
+        return null;
+    }
+
+    @Override
     public Map<String, Integer> getUserActionTokenLifespans() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -1273,7 +1278,7 @@ public class Realm implements RealmModel {
     }
 
     @Override
-    public void patchRealmLocalizationTexts(String s, Map<String, String> map) {
+    public void createOrUpdateRealmLocalizationTexts(String s, Map<String, String> map) {
 
     }
 
