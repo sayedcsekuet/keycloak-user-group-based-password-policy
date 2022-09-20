@@ -4,9 +4,8 @@ import com.github.sayedcsekuet.keycloak.Utils.PolicyCollector;
 import com.github.sayedcsekuet.keycloak.policy.Realm;
 import com.google.auto.service.AutoService;
 import org.jboss.logging.Logger;
-import org.keycloak.OAuth2Constants;
+import org.keycloak.Config;
 import org.keycloak.authentication.*;
-import org.keycloak.authentication.requiredactions.ConsoleUpdatePassword;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
@@ -29,8 +28,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@AutoService(DisplayTypeRequiredActionFactory.class)
-public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeRequiredActionFactory {
+@AutoService(RequiredActionFactory.class)
+public class GroupUpdatePassword implements RequiredActionProvider, RequiredActionFactory {
     private static final Logger logger = Logger.getLogger(GroupUpdatePasswordFactory.class);
 
     @Override
@@ -101,8 +100,9 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
             return;
         }
 
-        if (UserModel.RequiredAction.UPDATE_PASSWORD.name().equals(authSession.getClientNote(Constants.KC_ACTION_EXECUTING))
-                && "on".equals(formData.getFirst("logout-sessions"))) {
+        if (getId().equals(authSession.getClientNote(Constants.KC_ACTION_EXECUTING))
+                && "on".equals(formData.getFirst("logout-sessions")))
+        {
             session.sessions().getUserSessionsStream(realm, user)
                     .filter(s -> !Objects.equals(s.getId(), authSession.getParentSession().getId()))
                     .collect(Collectors.toList()) // collect to avoid concurrent modification as backchannelLogout removes the user sessions.
@@ -115,7 +115,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
         try {
             PasswordPolicy mergedPolicy = PolicyCollector.mergeGroupPolicy(context.getSession(), context.getRealm(), context.getUser());
             realm.setPasswordPolicy(mergedPolicy);
-            session.userCredentialManager().updateCredential(realm, user, UserCredentialModel.password(passwordNew, false));
+            user.credentialManager().updateCredential(UserCredentialModel.password(passwordNew, false));
             context.success();
         } catch (ModelException me) {
             errorEvent.detail(Details.REASON, me.getMessage()).error(Errors.PASSWORD_REJECTED);
@@ -139,14 +139,36 @@ public class GroupUpdatePassword implements RequiredActionProvider, DisplayTypeR
     }
 
     @Override
+    public RequiredActionProvider create(KeycloakSession session) {
+        return this;
+    }
+
+    @Override
+    public void init(Config.Scope scope) {
+
+    }
+
+    @Override
+    public void postInit(KeycloakSessionFactory keycloakSessionFactory) {
+
+    }
+
+    @Override
     public void close() {
 
     }
 
     @Override
-    public RequiredActionProvider createDisplay(KeycloakSession session, String displayType) {
-        if (displayType == null) return this;
-        if (!OAuth2Constants.DISPLAY_CONSOLE.equalsIgnoreCase(displayType)) return null;
-        return ConsoleUpdatePassword.SINGLETON;
+    public String getId() {
+        return UserModel.RequiredAction.UPDATE_PASSWORD.name();
+    }
+    @Override
+    public boolean isOneTimeAction() {
+        return true;
+    }
+
+    @Override
+    public String getDisplayText() {
+        return "Update Password";
     }
 }

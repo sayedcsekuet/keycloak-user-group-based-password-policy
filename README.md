@@ -15,11 +15,14 @@ The extension creates a new type of Password Policy.
 #### Keycloak v.11.x
 Download `keycloak-user-group-based-password-policy-1.0.0.jar` from Releases page (or from jar directory). Then deploy it into `$KEYCLOAK_HOME/standalone/deployments/` directory.
 
-#### Keycloak v.12.x
+#### Keycloak v.12.x to v.13.x
 Download `keycloak-user-group-based-password-policy-2.0.0.jar` from Releases page (or from jar directory). Then deploy it into `$KEYCLOAK_HOME/standalone/deployments/ directory`.
 
-#### Keycloak v.14.x
+#### Keycloak v.14.x to v.18.x
 Download `keycloak-user-group-based-password-policy-3.0.0.jar` from Releases page (or from jar directory). Then deploy it into `$KEYCLOAK_HOME/standalone/deployments/ directory`.
+
+#### Keycloak v.19.x to up
+Download `keycloak-user-group-based-password-policy-4.0.0.jar` from Releases page (or from jar directory). Then deploy it into `$KEYCLOAK_HOME/standalone/deployments/ directory`.
 
 ### Creating a new Password policy with type **Group Based Policy**
 
