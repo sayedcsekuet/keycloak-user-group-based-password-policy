@@ -44,8 +44,7 @@ public class PolicyCollector {
     }
 
     public static PasswordPolicy parsePolicy(KeycloakSession session, String policy) {
-        PasswordPolicy parsedPolicy = PasswordPolicy.parse(session, policy);
-        return parsedPolicy;
+        return PasswordPolicy.parse(session, policy);
     }
 
     public static PasswordPolicy createGroupPolicy(KeycloakSession session, RealmModel realm, UserModel user) {
@@ -56,7 +55,7 @@ public class PolicyCollector {
 
     public static PasswordPolicy mergeGroupPolicy(KeycloakSession session, RealmModel realm, UserModel user) {
         String groupPolicy = PolicyCollector.collectPolicies(session, realm, user);
-        if (groupPolicy.equals("")) {
+        if (groupPolicy.isEmpty()) {
             return realm.getPasswordPolicy();
         }
         String mergedPolicy = realm.getPasswordPolicy().toString() + " and " + groupPolicy;

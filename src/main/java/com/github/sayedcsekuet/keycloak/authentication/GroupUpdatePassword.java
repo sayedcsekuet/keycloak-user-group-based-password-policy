@@ -5,7 +5,11 @@ import com.github.sayedcsekuet.keycloak.policy.Realm;
 import com.google.auto.service.AutoService;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
-import org.keycloak.authentication.*;
+import org.keycloak.authentication.RequiredActionContext;
+import org.keycloak.authentication.RequiredActionFactory;
+import org.keycloak.authentication.RequiredActionProvider;
+import org.keycloak.common.util.Resteasy;
+import org.keycloak.common.util.ResteasyProvider;
 import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
 import org.keycloak.credential.CredentialProvider;
@@ -21,6 +25,7 @@ import org.keycloak.services.managers.AuthenticationManager;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.sessions.AuthenticationSessionModel;
+import org.jboss.resteasy.spi.HttpRequest;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -31,6 +36,7 @@ import java.util.stream.Collectors;
 @AutoService(RequiredActionFactory.class)
 public class GroupUpdatePassword implements RequiredActionProvider, RequiredActionFactory {
     private static final Logger logger = Logger.getLogger(GroupUpdatePasswordFactory.class);
+    private ResteasyProvider resteasyProvider;
 
     @Override
     public void evaluateTriggers(RequiredActionContext context) {
@@ -73,7 +79,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, RequiredActi
         RealmModel realm = context.getRealm();
         UserModel user = context.getUser();
         KeycloakSession session = context.getSession();
-        MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
+        MultivaluedMap<String, String> formData = resteasyProvider.getContextData(HttpRequest.class).getDecodedFormParameters();
         event.event(EventType.UPDATE_PASSWORD);
         String passwordNew = formData.getFirst("password-new");
         String passwordConfirm = formData.getFirst("password-confirm");
@@ -101,11 +107,10 @@ public class GroupUpdatePassword implements RequiredActionProvider, RequiredActi
         }
 
         if (getId().equals(authSession.getClientNote(Constants.KC_ACTION_EXECUTING))
-                && "on".equals(formData.getFirst("logout-sessions")))
-        {
+                && "on".equals(formData.getFirst("logout-sessions"))) {
             session.sessions().getUserSessionsStream(realm, user)
                     .filter(s -> !Objects.equals(s.getId(), authSession.getParentSession().getId()))
-                    .collect(Collectors.toList()) // collect to avoid concurrent modification as backchannelLogout removes the user sessions.
+                    .collect(Collectors.toList()) // collect to avoid concurrent modification as back channelLogout removes the user sessions.
                     .forEach(s -> AuthenticationManager.backchannelLogout(session, realm, s, session.getContext().getUri(),
                             context.getConnection(), context.getHttpRequest().getHttpHeaders(), true));
         }
@@ -124,7 +129,6 @@ public class GroupUpdatePassword implements RequiredActionProvider, RequiredActi
                     .setError(me.getMessage(), me.getParameters())
                     .createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
             context.challenge(challenge);
-            return;
         } catch (Exception ape) {
             errorEvent.detail(Details.REASON, ape.getMessage()).error(Errors.PASSWORD_REJECTED);
             Response challenge = context.form()
@@ -132,7 +136,6 @@ public class GroupUpdatePassword implements RequiredActionProvider, RequiredActi
                     .setError(ape.getMessage())
                     .createResponse(UserModel.RequiredAction.UPDATE_PASSWORD);
             context.challenge(challenge);
-            return;
         } finally {
             realm.setPasswordPolicy(originalPolicy);
         }
@@ -140,6 +143,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, RequiredActi
 
     @Override
     public RequiredActionProvider create(KeycloakSession session) {
+        setResteasyProvider(Resteasy.getProvider());
         return this;
     }
 
@@ -162,6 +166,7 @@ public class GroupUpdatePassword implements RequiredActionProvider, RequiredActi
     public String getId() {
         return UserModel.RequiredAction.UPDATE_PASSWORD.name();
     }
+
     @Override
     public boolean isOneTimeAction() {
         return true;
@@ -170,5 +175,9 @@ public class GroupUpdatePassword implements RequiredActionProvider, RequiredActi
     @Override
     public String getDisplayText() {
         return "Update Password";
+    }
+
+    void setResteasyProvider(ResteasyProvider resteasyProvider) {
+        this.resteasyProvider = resteasyProvider;
     }
 }
