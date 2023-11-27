@@ -628,7 +628,6 @@ public class Realm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-
     @Override
     public void addDefaultRole(String name) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -1058,11 +1057,6 @@ public class Realm implements RealmModel {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * Time in seconds since epoc
-     *
-     * @return
-     */
     @Override
     public int getNotBefore() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -1092,7 +1086,6 @@ public class Realm implements RealmModel {
     public void setEventsExpiration(long expiration) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 
     @Override
     public Stream<String> getEventsListenersStream() {
@@ -1225,7 +1218,6 @@ public class Realm implements RealmModel {
     public Stream<GroupModel> getTopLevelGroupsStream(Integer integer, Integer integer1) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
 
     @Override
     public Stream<GroupModel> searchForGroupByNameStream(String s, Integer integer, Integer integer1) {
